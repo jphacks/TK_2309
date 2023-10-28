@@ -214,6 +214,33 @@ def lambda_handler(event, context):
             user.set_name(user_message)
             confirm_nickname(reply_token, user_message+'で名前はあっていますか？')
             return {'statusCode': 200, 'body': json.dumps('Success!')}
+    # ユーザが名前の入力のやり直しを選択した場合
+    elif user_message == '【ニックネーム-間違え】':
+        user.set_name('user-input-waiting')
+        send_reply_message(reply_token, 'もう一度名前を教えてください！')
+        return {'statusCode': 200, 'body': json.dumps('Success!')}
+    
+    # テーブルから指定した項目を取得
+    response = chat_table.query(
+        KeyConditionExpression=boto3.dynamodb.conditions.Key('line_user_id').eq(line_user_id)
+    )
+
+    # 初期設定のシステムプロンプト
+    chat_history = []
+    
+    # チャット履歴を取得
+    if 'Items' in response and len(response['Items']) > 0:
+        items = response['Items']
+        sorted_items = sorted(items, key=lambda x: int(x['created_at']))
+        sorted_items = sorted_items[-5:]
+        
+        for item in sorted_items:
+            chat_history.append({"role": "user", "content": item['user_message']})
+            chat_history.append({"role": "assistant", "content": item['gpt_response']})
+
+    chat_history.append({"role": "user", "content": user_message})
+            
+        
 
     # ユーザが名前の入力のやり直しを選択した場合
     elif user_message == '【ニックネーム-間違え】':
