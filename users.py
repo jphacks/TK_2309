@@ -78,3 +78,23 @@ class Users:
             return self.data['point_count']
         else:
             return 0
+
+    def add_point(self):
+        # 本日初正解ならポイントを追加して、最終ポイント獲得日を更新
+        if self.data['last_pointed_month'] == self.__get_adjusted_month_str() and self.data["last_pointed_date"] != self.__get_adjusted_date_str():
+            if day_str in double_days:
+                self.data['point_count'] += 2
+            else:
+                self.data['point_count'] += 1
+            self.data["last_pointed_date"] = self.__get_adjusted_date_str()
+        elif self.data["last_pointed_date"] == self.__get_adjusted_date_str():
+            self.__save()
+        # 新しい月ならば、ポイントを１にして最終ポイント獲得月を更新
+        else:
+            self.data['last_pointed_month'] = self.__get_adjusted_month_str()
+            self.data['point_count'] = 1
+        self.__save()
+
+    def add_usage(self):
+        self.data['api_count_total'] += 1
+        self.__save()
