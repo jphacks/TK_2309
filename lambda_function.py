@@ -1,3 +1,45 @@
+import json
+import logging
+import boto3
+import time
+import yaml
+import random
+import stripe
+import re
+import os
+import urllib.parse
+import requests
+import users
+
+from datetime import datetime, timedelta, timezone
+from line_handler import send_reply_message, send_for_count_over
+from openai_handler import send_to_openai
+from dynamodb_handler import get_usage_count, get_user_point, check_user_point
+from line_handler import send_reply_message, send_for_count_over, send_flex_message, confirm_nickname
+from similarity_points import determine_points
+
+# loggerの設定
+logger = logging.getLogger()
+logger.setLevel(logging.INFO)
+
+# configs.ymlファイルの読み込み
+with open("configs.yml", "r") as f:
+    configs = yaml.safe_load(f)
+    
+# 環境変数からAPIキーを取得
+goo_lab_api = os.environ["goo_lab_api"]
+    
+# DynamoDB接続
+dynamodb = boto3.resource("dynamodb")
+chat_table = dynamodb.Table(configs["dynamodb"]["chat_history"])
+user_table = dynamodb.Table(configs["dynamodb"]["users"])
+
+stripe.api_key = os.environ.get('STRIPE_SECRET_KEY')
+PRICE_ID_MONTH = os.environ.get('PRICE_ID_MONTH')
+PRICE_ID_HALF_YEAR = os.environ.get('PRICE_ID_HALF_YEAR')
+BITLY_TOKEN = os.getenv('BITLY_TOKEN')
+
+
 def lambda_handler(event, context):
       try:
         body = json.loads(event['body'])
