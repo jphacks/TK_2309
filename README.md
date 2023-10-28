@@ -1,6 +1,7 @@
-# サンプル（プロダクト名）
+# Twins Link
 
-[![IMAGE ALT TEXT HERE](https://jphacks.com/wp-content/uploads/2023/07/JPHACKS2023_ogp.png)](https://www.youtube.com/watch?v=yYRQEdfGjEg)
+![image](https://github.com/jphacks/TK_2309/assets/148039751/68071516-613f-4a8b-8b59-b870ab2c0317)
+
 
 ## 製品概要
 ### 背景(製品開発のきっかけ、課題等）
