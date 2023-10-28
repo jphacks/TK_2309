@@ -34,3 +34,15 @@ def confirm_nickname(reply_token, text):
         )
     except LineBotApiError as e:
         print(f"Error: {e}") 
+
+# 利用回数制限を迎えたユーザー対してはプレミアム会員を勧める。
+def send_for_count_over(reply_token, text):
+    try:
+        # プレミアム会員になるためのStripeの決済画面へのリンク
+        line_bot_api.reply_message(
+            reply_token,
+            TextSendMessage(text=text + f"\n\nプレミアム会員になるにはメニューから",)
+        )
+    except LineBotApiError as e:
+        print(f"Error: {e}")
+
