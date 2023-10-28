@@ -39,6 +39,7 @@ PRICE_ID_MONTH = os.environ.get('PRICE_ID_MONTH')
 PRICE_ID_HALF_YEAR = os.environ.get('PRICE_ID_HALF_YEAR')
 BITLY_TOKEN = os.getenv('BITLY_TOKEN')
 
+
 def handle_payment_request(user_id):
     print("handle_payment_request function called")
     try:
@@ -145,7 +146,6 @@ def handle_payment_request(user_id):
         logger.error(f"An error occurred: {e}")  # これはエラーメッセージをログに出力します
         return None
 
-
 def create_web_tweet_link(tweet_text):
     base_url = "https://twitter.com/intent/tweet"
     tweet_parameters = {"text": tweet_text}
@@ -166,10 +166,9 @@ def shorten_url(long_url, bitly_token):
         return short_url
     else:
         return long_url
-        
 
 def lambda_handler(event, context):
-      try:
+    try:
         body = json.loads(event['body'])
         print(f"Body content: {body}")  # Debug information
         message_event = body['events'][0]
@@ -183,7 +182,7 @@ def lambda_handler(event, context):
         text = "メッセージはテキストで送信してください"
         send_reply_message(message_event['replyToken'], text)
         return {'statusCode': 200, 'body': json.dumps('Error!')}
-
+        
     # 重要な情報を変数に格納
     reply_token = body['events'][0]['replyToken']
     user_message = body['events'][0]['message']['text']
@@ -214,6 +213,7 @@ def lambda_handler(event, context):
             user.set_name(user_message)
             confirm_nickname(reply_token, user_message+'で名前はあっていますか？')
             return {'statusCode': 200, 'body': json.dumps('Success!')}
+
     # ユーザが名前の入力のやり直しを選択した場合
     elif user_message == '【ニックネーム-間違え】':
         user.set_name('user-input-waiting')
@@ -224,7 +224,7 @@ def lambda_handler(event, context):
     response = chat_table.query(
         KeyConditionExpression=boto3.dynamodb.conditions.Key('line_user_id').eq(line_user_id)
     )
-
+    
     # 初期設定のシステムプロンプト
     chat_history = []
     
@@ -255,8 +255,7 @@ def lambda_handler(event, context):
     phrase = configs["questions"][int(day_str)]["phrase"]
     explanation = configs["questions"][int(day_str)]["explanation"]
     keywords = ["変換", "変え", "入れ替え", "足す", "+", "引く", "-", "組み合わ", "差し引", "抜く", "置き換え", "削除", "繋げて", "付ける", "漢字に", "ひらがなに", "カタカナに", "逆", "反対"]
-
-
+    
     # LINE上での処理
     if user_message == "[挑戦]ツインズリンク":
         if day_str in double_days:
@@ -322,7 +321,7 @@ def lambda_handler(event, context):
             points = determine_points(goo_lab_api, phrase, text)
             send_reply_message(message_event['replyToken'], text + "\n" + str(points) + "点です！！")
 
-
+                
     # 会話履歴のDynamoDB更新
     chat_table.put_item(
         Item={
