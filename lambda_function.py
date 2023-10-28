@@ -282,6 +282,12 @@ def lambda_handler(event, context):
     elif user_message == "[確認]先月のランキング":
         text = "以下が先月のランキングになります！！"
         send_reply_message(message_event['replyToken'], text)
+    elif user_message == "【ニックネーム-確定】":
+        return {'statusCode': 200, 'body': json.dumps('Success!')}
+    elif user_message == "友達2倍":
+        user.reset_count()
+        text = "秘密のパスワードが使用されました！1日の利用制限がリセットされました。"
+        send_reply_message(message_event['replyToken'], text)
     else:
         # 利用回数を取得し、カウントを1つ増やす。
         user.add_usage()
@@ -295,9 +301,27 @@ def lambda_handler(event, context):
         if phrase in text:
             # ポイントを１つ増やす。
             user.add_point()
+            base_tweet_text = (phrase + " ")*4 + "!\n\n" +  "Twins Linkの今日のツインズリンクをクリアしました！\n月間ポイントが加算されました。\n\n#Twins Linkー #プレゼント #Amazonギフトカード #懸賞 \n\n気になった方は以下のリンクから追加！\n"
+            long_link_url = "https://liff.line.me/1645278921-kWRPP32q/?accountId=478khwxt"
+            short_link_url = shorten_url(long_link_url, BITLY_TOKEN)
+            if short_link_url is not None:
+                base_tweet_text += short_link_url
+            else:
+                base_tweet_text += long_link_url
+        
+            # base_tweet_textをエンコードせずにそのまま使用
+            long_tweet_url = create_web_tweet_link(base_tweet_text)
+            short_tweet_url = shorten_url(long_tweet_url, BITLY_TOKEN)
+        
+            if short_tweet_url is not None:  
+                send_reply_message(message_event['replyToken'], text + "\n\nおめでとうございます！ミッションクリア！\n月間ポイントが加算されました。\n\n-----------\n【今日のライフハック】\n" + explanation + "\n-----------\n\nこの結果をTwitterでシェアしましょう！！以下のリンクから共有しましょう！\n\n(" + short_tweet_url + ")")
+            else:
+                send_reply_message(message_event['replyToken'], text + "\n\nおめでとうございます！ミッションクリア！\n月間ポイントが加算されました。\n\n-----------\n【今日のライフハック】\n" + explanation + "\n-----------\n\nこの結果をTwitterでシェアする機能は現在利用できません。")
+            get_user_point(line_user_id)
         else:
             points = determine_points(goo_lab_api, phrase, text)
             send_reply_message(message_event['replyToken'], text + "\n" + str(points) + "点です！！")
+
 
     # 会話履歴のDynamoDB更新
     chat_table.put_item(
