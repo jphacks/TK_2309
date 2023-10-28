@@ -55,3 +55,17 @@ def hiragana_conversion(goo_lab_api, sentence, output_type="hiragana", request_i
     result = data["converted"]
     
     return result
+
+# 得点決定関数
+def determine_points(app_id, theme_text, ai_text):
+    # 2つのテキストをひらがな化して、スペースと読点を削除
+    hiragana_theme_text = hiragana_conversion(app_id , theme_text).replace(" ", "").replace("、", "")
+    hiragana_ai_text = hiragana_conversion(app_id, ai_text).replace(" ", "").replace("、", "")
+
+    # 完全一致するかを判定し、完全一致しなければ類似度を得点にする
+    if hiragana_theme_text in hiragana_ai_text:
+        print(hiragana_theme_text)
+    else:
+        points = text_pair_similarity(app_id, theme_text, ai_text)
+    
+    return points
