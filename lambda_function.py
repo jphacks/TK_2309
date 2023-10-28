@@ -146,6 +146,28 @@ def handle_payment_request(user_id):
         return None
 
 
+def create_web_tweet_link(tweet_text):
+    base_url = "https://twitter.com/intent/tweet"
+    tweet_parameters = {"text": tweet_text}
+    url_parameters = urllib.parse.urlencode(tweet_parameters)
+    tweet_url = base_url + "?" + url_parameters
+    return tweet_url
+
+def shorten_url(long_url, bitly_token):
+    BITLY_API_URL = "https://api-ssl.bitly.com/v4/shorten"
+    headers = {"Authorization": f"Bearer {bitly_token}",
+               "Content-Type": "application/json"}
+    data = json.dumps({"long_url": long_url})
+    response = requests.post(BITLY_API_URL, headers=headers, data=data)
+    print(f"Bitly API response: {response.json()}")  # レスポンスのログ出力
+    if response.status_code == 200:
+        short_url = response.json()["link"]
+        print(f"Shortened URL: {short_url}")  # 短縮URLのログ出力
+        return short_url
+    else:
+        return long_url
+        
+
 def lambda_handler(event, context):
       try:
         body = json.loads(event['body'])
