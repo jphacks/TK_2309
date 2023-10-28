@@ -46,3 +46,16 @@ def send_for_count_over(reply_token, text):
     except LineBotApiError as e:
         print(f"Error: {e}")
 
+def send_flex_message(reply_token, contents):
+    try:
+        line_bot_api.reply_message(
+            reply_token,
+            FlexSendMessage(
+                alt_text='Flex Message alt text',
+                contents=contents
+            )
+        )
+    except LineBotApiError as e:
+        print(e.status_code)
+        print(e.error.message)
+        print(e.error.details)
