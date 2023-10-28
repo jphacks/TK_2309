@@ -159,13 +159,16 @@ def shorten_url(long_url, bitly_token):
                "Content-Type": "application/json"}
     data = json.dumps({"long_url": long_url})
     response = requests.post(BITLY_API_URL, headers=headers, data=data)
+    print(response.status_code, type(response.status_code))
     print(f"Bitly API response: {response.json()}")  # レスポンスのログ出力
-    if response.status_code == 200:
+    if response.status_code == 201 or response.status_code == 200:
+        print("Bitly Success")
         short_url = response.json()["link"]
         print(f"Shortened URL: {short_url}")  # 短縮URLのログ出力
         return short_url
     else:
-        return long_url
+        return None
+
 
 def lambda_handler(event, context):
     try:
@@ -235,10 +238,11 @@ def lambda_handler(event, context):
         sorted_items = sorted_items[-5:]
         
         for item in sorted_items:
+            chat_history.append({"role": "system", "content": "あなたは優秀なAIアシスタントです。私の入力に対して必ず1文で簡潔に答えてください。"})
             chat_history.append({"role": "user", "content": item['user_message']})
             chat_history.append({"role": "assistant", "content": item['gpt_response']})
 
-    chat_history.append({"role": "user", "content": user_message})
+    chat_history.append({"role": "user", "content": user_message + "\n\n私の入力に簡潔に答えてください。"})
 
     # 諦めたかどうかを決める変数
     retreated = False
@@ -249,9 +253,7 @@ def lambda_handler(event, context):
     # 日の部分だけを文字列として取得
     day_str = now.strftime("%d")
     
-    # 今月のポイント2倍デー
-    double_days = ["1", "6", "12", "21", "29"]
-    
+    theme = configs["questions"][int(day_str)]["theme"]
     phrase = configs["questions"][int(day_str)]["phrase"]
     explanation = configs["questions"][int(day_str)]["explanation"]
     keywords = ["変換", "変え", "入れ替え", "足す", "+", "引く", "-", "組み合わ", "差し引", "抜く", "置き換え", "削除", "繋げて", "付ける", "漢字に", "ひらがなに", "カタカナに", "逆", "反対"]
@@ -261,7 +263,7 @@ def lambda_handler(event, context):
         if day_str in double_days:
             hidden_text = "ツインズリンクに挑戦しよう！\n今日はポイント2倍デー！クリアすると、2ポイントを獲得できます！\n\n-----------\n今日のフレーズ:" + phrase +"\n【" + phrase + "】と私に言わせたらクリア！早速会話を始めましょう！\n-----------"
         else:
-            hidden_text = "ツインズリンクに挑戦しよう！\n-----------\n今日のフレーズ:" + phrase +"\n【" + phrase + "】と私に言わせたらクリア！早速会話を始めましょう！\n-----------"
+            hidden_text = "今日のお題:\n【" + phrase + "】\n-----------\nこの内容を私に言わせてみてください！"
         text = "ツインズリンクに挑戦しよう！今日のフレーズを私に言わせることが出来たら成功！"
         send_reply_message(message_event['replyToken'], hidden_text)
     elif any(keyword in user_message for keyword in keywords) or phrase in user_message:
@@ -279,7 +281,7 @@ def lambda_handler(event, context):
         text = "上記の画像を参考に使い方を確認してください！"
         send_reply_message(message_event['replyToken'], text)
     elif user_message == "[確認]先月のランキング":
-        text = "以下が先月のランキングになります！！"
+        text = "以下が先月のランキングになります！\n--------------------------------\n🥇しょうまさん-3,452.1 point\n🥈りょうさん-3,391.7 point\n🥉ひまるんさん-2,971.0 point\n4位ジャパンさん-2,813.7 point\n5位ハックスさん-2,771.4 point\n\n--------------------------------\nおめでとうございます!！"
         send_reply_message(message_event['replyToken'], text)
     elif user_message == "【ニックネーム-確定】":
         return {'statusCode': 200, 'body': json.dumps('Success!')}
@@ -287,6 +289,15 @@ def lambda_handler(event, context):
         user.reset_count()
         text = "秘密のパスワードが使用されました！1日の利用制限がリセットされました。"
         send_reply_message(message_event['replyToken'], text)
+    elif user_message == "[契約]プレミアム会員":
+        contents = handle_payment_request(line_user_id)
+        if contents is None:
+            error_message = "An error occurred while handling the payment request."
+            send_reply_message(reply_token, error_message)
+            return {'statusCode': 200, 'body': json.dumps('Error handling payment!')}
+        print(f"Flex Message contents: {contents}")
+        send_flex_message(reply_token, contents)
+        return {'statusCode': 200, 'body': json.dumps('Payment handled!')}
     else:
         # 利用回数を取得し、カウントを1つ増やす。
         user.add_usage()
@@ -297,29 +308,24 @@ def lambda_handler(event, context):
             return {'statusCode': 200, 'body': json.dumps('Error!')}
         else:
             text = send_to_openai(chat_history)
-        if phrase in text:
-            # ポイントを１つ増やす。
+        points = determine_points(goo_lab_api, theme, phrase, text)
+        if points > 70:
             user.add_point()
-            base_tweet_text = (phrase + " ")*4 + "!\n\n" +  "Twins Linkの今日のツインズリンクをクリアしました！\n月間ポイントが加算されました。\n\n#Twins Linkー #プレゼント #Amazonギフトカード #懸賞 \n\n気になった方は以下のリンクから追加！\n"
+            base_tweet_text = "ツインズリンクを" + str(determine_points(goo_lab_api, theme, phrase, text)) + "点でクリア！\n\n今日のお題\n【" + phrase + "】" +"\n\n#TwinsLink #JPHACKS #JPHACKS2023 \n\n気になった方は以下のリンクから追加！\n"
             long_link_url = "https://liff.line.me/1645278921-kWRPP32q/?accountId=478khwxt"
-            short_link_url = shorten_url(long_link_url, BITLY_TOKEN)
-            if short_link_url is not None:
-                base_tweet_text += short_link_url
-            else:
-                base_tweet_text += long_link_url
-        
+            base_tweet_text += long_link_url
+            
             # base_tweet_textをエンコードせずにそのまま使用
             long_tweet_url = create_web_tweet_link(base_tweet_text)
             short_tweet_url = shorten_url(long_tweet_url, BITLY_TOKEN)
         
             if short_tweet_url is not None:  
-                send_reply_message(message_event['replyToken'], text + "\n\nおめでとうございます！ミッションクリア！\n月間ポイントが加算されました。\n\n-----------\n【今日のライフハック】\n" + explanation + "\n-----------\n\nこの結果をTwitterでシェアしましょう！！以下のリンクから共有しましょう！\n\n(" + short_tweet_url + ")")
+                send_reply_message(message_event['replyToken'], text + "\n-----------\n" + "今回のプロンプトエンジニアリングは" + str(points) + "点です！！\n------\n"+ explanation +"\n------\n今日の参考サイト:\nhttps://awake-polka-44a.notion.site/10-7c405d662f574caf8b1e6e8145085080\n\nこの結果をTwitterでシェアしましょう！！\n\n(" + short_tweet_url + ")")
             else:
-                send_reply_message(message_event['replyToken'], text + "\n\nおめでとうございます！ミッションクリア！\n月間ポイントが加算されました。\n\n-----------\n【今日のライフハック】\n" + explanation + "\n-----------\n\nこの結果をTwitterでシェアする機能は現在利用できません。")
+                send_reply_message(message_event['replyToken'], text + "\n-----------\n" + "今回のプロンプトエンジニアリングは" + str(points) + "点です！！\n------\n"+ explanation +"\n------\n今回の参考サイト:\nhttps://awake-polka-44a.notion.site/10-7c405d662f574caf8b1e6e8145085080\n\nこの結果をTwitterでシェアしましょう！！\n\n(" + long_tweet_url + ")")
             get_user_point(line_user_id)
         else:
-            points = determine_points(goo_lab_api, phrase, text)
-            send_reply_message(message_event['replyToken'], text + "\n" + str(points) + "点です！！")
+            send_reply_message(message_event['replyToken'], text + "\n-----------\n" + "今回のプロンプトエンジニアリングは" + str(points) + "点です。\nもう少し頑張りましょう！")
 
                 
     # 会話履歴のDynamoDB更新
