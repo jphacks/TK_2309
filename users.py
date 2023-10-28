@@ -98,3 +98,25 @@ class Users:
     def add_usage(self):
         self.data['api_count_total'] += 1
         self.__save()
+
+    def set_name(self, name):
+        self.data['name'] = name
+        self.__save()
+
+    def __get_date_time_str(self):
+        """ 現在の日時(日本時間)を文字列で取得 """
+        return datetime.now(timezone(timedelta(hours=9))).strftime('%Y-%m-%d %H:%M:%S')
+
+    def __get_adjusted_date_str(self):
+        """ 現在の日付(日本時間)を文字列で取得 """
+        japan_tz = timezone(timedelta(hours=9))
+        now = datetime.now(japan_tz)
+        current_date = now.date()
+        return current_date.strftime('%Y-%m-%d')
+        
+    def __get_adjusted_month_str(self):
+        """ 現在の年月(日本時間)を文字列で取得 """
+        japan_tz = timezone(timedelta(hours=9))
+        now = datetime.now(japan_tz)
+        current_date = now.date()
+        return current_date.strftime('%Y-%m')
