@@ -63,7 +63,7 @@ def determine_points(goo_lab_api, theme_text, ai_text):
 
     # 完全一致するかを判定し、完全一致しなければ類似度を得点にする
     if hiragana_theme_text in hiragana_ai_text:
-        print(hiragana_theme_text)
+        points = 100
     else:
         points = text_pair_similarity(goo_lab_api, theme_text, ai_text)
     
