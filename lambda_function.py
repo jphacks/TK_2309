@@ -195,6 +195,36 @@ def lambda_handler(event, context):
     body = json.loads(event['body'])
     # ユーザ情報
     user = users.Users(body['events'][0]['source']['userId'])
+    
+    # ニックネームの取得
+    # ニックネームが空白の場合
+    if user.data['name'] == '':
+        user.set_name('user-input-waiting')
+        send_reply_message(reply_token, '【チュートリアル】\n4文字以上であなたのニックネームを教えてください！')
+        return {'statusCode': 200, 'body': json.dumps('Success!')}
+        
+    # 　ニックネームがユーザの入力待ちの場合
+    elif user.data['name'] == 'user-input-waiting':
+        # 文字数が足りなかった場合
+        if len(user_message) < 4:
+            send_reply_message(reply_token, 'ニックネームは4文字以上でお願いします！\nもう一度あなたのニックネームを教えてください！')
+            return {'statusCode': 200, 'body': json.dumps('Success!')}
+        else:
+            # ユーザの情報を更新
+            user.set_name(user_message)
+            confirm_nickname(reply_token, user_message+'で名前はあっていますか？')
+            return {'statusCode': 200, 'body': json.dumps('Success!')}
+
+    # ユーザが名前の入力のやり直しを選択した場合
+    elif user_message == '【ニックネーム-間違え】':
+        user.set_name('user-input-waiting')
+        send_reply_message(reply_token, 'もう一度名前を教えてください！')
+        return {'statusCode': 200, 'body': json.dumps('Success!')}
+    
+    # テーブルから指定した項目を取得
+    response = chat_table.query(
+        KeyConditionExpression=boto3.dynamodb.conditions.Key('line_user_id').eq(line_user_id)
+    )
 
     phrase = configs["questions"][int(day_str)]["phrase"]
     explanation = configs["questions"][int(day_str)]["explanation"]
