@@ -71,3 +71,17 @@ def lambda_handler(event, context):
             points = determine_points(goo_lab_api, phrase, text)
             send_reply_message(message_event['replyToken'], text + "\n" + str(points) + "点です！！")
 
+    # 会話履歴のDynamoDB更新
+    chat_table.put_item(
+        Item={
+            "line_user_id": line_user_id,
+            "user_message": user_message,
+            "gpt_response": text,
+            "created_at": str(round(time.time()))
+        }
+    )
+    
+    return {
+        'statusCode': 200,
+        'body': json.dumps('Hello from Lambda!')
+    }
