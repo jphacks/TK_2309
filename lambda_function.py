@@ -39,6 +39,112 @@ PRICE_ID_MONTH = os.environ.get('PRICE_ID_MONTH')
 PRICE_ID_HALF_YEAR = os.environ.get('PRICE_ID_HALF_YEAR')
 BITLY_TOKEN = os.getenv('BITLY_TOKEN')
 
+def handle_payment_request(user_id):
+    print("handle_payment_request function called")
+    try:
+        # Create the Stripe payment sessions
+        session_month = stripe.checkout.Session.create(
+            payment_method_types=["card"],
+            line_items=[{
+                "price": PRICE_ID_MONTH,  # set your price ID here
+                "quantity": 1,
+            }],
+            mode="subscription",
+            success_url='https://shoma0321.github.io/success/',
+            cancel_url='https://shoma0321.github.io/cancel/',
+            client_reference_id=user_id
+        )
+        session_half_year = stripe.checkout.Session.create(
+            payment_method_types=["card"],
+            line_items=[{
+                "price": PRICE_ID_HALF_YEAR,  # set your price ID here
+                "quantity": 1,
+            }],
+            mode="subscription",
+            success_url='https://shoma0321.github.io/success/',
+            cancel_url='https://shoma0321.github.io/cancel/',
+            client_reference_id=user_id
+        )
+        
+        print(f"Stripe session ID for a month: {session_month.id}")
+        print(f"Stripe session ID for a half year: {session_half_year.id}")
+        
+        # Create the Flex Message contents
+        contents = {
+            "type": "bubble",
+            "styles": {
+                "body": {
+                    "backgroundColor": "#FFFFFF",
+                }
+            },
+            "hero": {
+                "type": "image",
+                "url": "https://shoma0321.github.io/success/twinds_linker.png",
+                "size": "full",
+                "aspectRatio": "20:13",
+                "aspectMode": "cover",
+            },
+            "body": {
+                "type": "box",
+                "layout": "vertical",
+                "contents": [
+                    {
+                        "type": "text",
+                        "text": "使い放題プラン",
+                        "weight": "bold",
+                        "size": "xl"
+                    },
+                    {
+                        "type": "box",
+                        "layout": "baseline",
+                        "margin": "md",
+                        "contents": [
+                            {
+                                "type": "text",
+                                "text": "月額400円(税込)",
+                                "size": "sm",
+                                "color": "#999999",
+                                "margin": "md",
+                                "flex": 0
+                            }
+                        ]
+                    },
+                    {
+                        "type": "separator",
+                        "margin": "md"
+                    },
+                    {
+                        "type": "button",
+                        "style": "primary",
+                        "color": "#A9A9A9",
+                        "action": {
+                            "type": "uri",
+                            "label": "プレミアム-1ヶ月(400円)",
+                            "uri": session_month.url
+                        }
+                    },
+                 {
+                        "type": "separator",
+                        "margin": "md"
+                    },
+                    {
+                        "type": "button",
+                        "style": "primary",
+                        "color": "#A9A9A9",
+                        "action": {
+                            "type": "uri",
+                            "label": "プレミアム-半年(1500円)",
+                            "uri": session_half_year.url
+                        }
+                    }
+                ]
+            }
+        }
+        return contents
+    except Exception as e:
+        logger.error(f"An error occurred: {e}")  # これはエラーメッセージをログに出力します
+        return None
+
 
 def lambda_handler(event, context):
       try:
