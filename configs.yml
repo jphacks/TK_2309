@@ -1,0 +1,9 @@
+openai:
+  gpt_model: "gpt-3.5-turbo"
+
+dynamodb:
+  chat_history: "twins_linker"
+  users: "twins_linker_user"
+  
+# 1日当たりの利用回数制限
+limit: 5
