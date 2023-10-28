@@ -20,3 +20,17 @@ def send_reply_message(reply_token, text):
         )
     except LineBotApiError as e:
         print(f"Error: {e}")
+
+# ニックネームの確認用   
+def confirm_nickname(reply_token, text):
+    try:
+        line_bot_api.reply_message(
+            reply_token,
+            TextSendMessage(text=text,
+                    quick_reply=QuickReply(items=[
+                        QuickReplyButton(action=MessageAction(label="あっている", text="【ニックネーム-確定】")),
+                        QuickReplyButton(action=MessageAction(label="間違っている", text="【ニックネーム-間違え】")),
+                    ]))
+        )
+    except LineBotApiError as e:
+        print(f"Error: {e}") 
