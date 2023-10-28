@@ -34,3 +34,18 @@ class Users:
         # 登録済みの場合
         else:
             self.data = user['Item']
+
+    def __create_user(self):
+        """ LINEユーザテーブルに新規ユーザを登録する """
+
+        self.data = {
+            'line_user_id': self.line_user_id,
+            'name': '',
+            'last_sended_on': self.__get_adjusted_date_str(),
+            'last_pointed_month':self.__get_adjusted_month_str(),
+            'last_pointed_date': 0,
+            'point_count': 0,
+            'api_count_total': 0,
+            'created_at': self.__get_date_time_str()
+        }
+        self.__save()
