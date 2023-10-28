@@ -239,22 +239,23 @@ def lambda_handler(event, context):
             chat_history.append({"role": "assistant", "content": item['gpt_response']})
 
     chat_history.append({"role": "user", "content": user_message})
-            
-        
 
-    # ユーザが名前の入力のやり直しを選択した場合
-    elif user_message == '【ニックネーム-間違え】':
-        user.set_name('user-input-waiting')
-        send_reply_message(reply_token, 'もう一度名前を教えてください！')
-        return {'statusCode': 200, 'body': json.dumps('Success!')}
+    # 諦めたかどうかを決める変数
+    retreated = False
     
-    # テーブルから指定した項目を取得
-    response = chat_table.query(
-        KeyConditionExpression=boto3.dynamodb.conditions.Key('line_user_id').eq(line_user_id)
-    )
-
+    # 現在の日付と時刻を取得
+    japan_tz = timezone(timedelta(hours=9))
+    now = datetime.now(japan_tz)
+    # 日の部分だけを文字列として取得
+    day_str = now.strftime("%d")
+    
+    # 今月のポイント2倍デー
+    double_days = ["1", "6", "12", "21", "29"]
+    
     phrase = configs["questions"][int(day_str)]["phrase"]
     explanation = configs["questions"][int(day_str)]["explanation"]
+    keywords = ["変換", "変え", "入れ替え", "足す", "+", "引く", "-", "組み合わ", "差し引", "抜く", "置き換え", "削除", "繋げて", "付ける", "漢字に", "ひらがなに", "カタカナに", "逆", "反対"]
+
 
     # LINE上での処理
     if user_message == "[挑戦]ツインズリンク":
