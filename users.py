@@ -49,3 +49,32 @@ class Users:
             'created_at': self.__get_date_time_str()
         }
         self.__save()
+
+    
+    def __save(self):
+        self.table.put_item(Item=self.data)
+
+    def get_user(self):
+        """ LINEユーザテーブルからデータを取得 """
+        return self.table.get_item(Key={'line_user_id': self.line_user_id})
+
+    def reset_count(self):
+        """ 本日のカウントをリセットする """
+        self.data['last_sended_on'] = self.__get_adjusted_date_str()
+        self.data['api_count_total'] = 0
+        self.__save()
+
+    def get_usage(self):
+        """ 現在の使用回数を取得する """
+        if self.data['last_sended_on'] == self.__get_adjusted_date_str():
+            return self.data['api_count_total']
+        else:
+            self.reset_count()
+            return 0
+
+    def get_point(self):
+        """ 現在のポイントを取得する """
+        if self.data['last_pointed_month'] == self.__get_adjusted_month_str():
+            return self.data['point_count']
+        else:
+            return 0
