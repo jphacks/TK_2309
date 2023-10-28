@@ -93,3 +93,14 @@ def get_user_point(line_user_id):
         }
     )
     return point
+
+
+# 月間獲得ポイントを確認する関数   
+def check_user_point(line_user_id):
+    # ユーザーテーブルからユーザー情報を取得
+    response = table2.get_item(Key={"line_user_id": line_user_id})
+    if 'Item' in response:
+        point = response['Item'].get('user_point', 0)
+    else:
+        point = 0
+    return point
