@@ -31,7 +31,10 @@ Twins Linkは、ライフハックに関するお題を用いて、プロンプ�
 ![説明仕様書png](https://github.com/jphacks/TK_2309/assets/83398586/70603a6c-a709-44e4-a06f-e5572a4129bf)
 <br>
 
-Twins Link起動後、「Let's リンク」を選択して、「お題例:散らかりがちなケーブルをコンパクトにまとめることができます！」に対して以下の質問を投げかけてみてください。動作を確認できます。<br><br>
+以下のURLからLINE友達追加して実際に触っていただけます。<br>
+https://liff.line.me/1645278921-kWRPP32q/?accountId=478khwxt
+
+Twins Link起動後、「Let's リンク」を選択して、「お題例:散らかりがちなケーブルをコンパクトにまとめることができます！」に対して以下の質問を投げかけてみてください。動作を確認できます。<br>
 以下のURLからLINE友達追加して実際に触っていただけます。<br>
 https://liff.line.me/1645278921-kWRPP32q/?accountId=478khwxt
 
