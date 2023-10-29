@@ -12,7 +12,7 @@ https://liff.line.me/1645278921-kWRPP32q/?accountId=478khwxt
 
 ## デモンストレーション動画
 以下のURLから動画を再生できます。
-ttps://youtu.be/1XHrA2Y-X0g
+https://youtu.be/1XHrA2Y-X0g
 
 
 <br>
