@@ -1,6 +1,7 @@
 import os
 import boto3
 from datetime import datetime, timedelta, timezone
+from decimal import Decimal
 
 
 # 現在の日付と時刻を取得
@@ -78,19 +79,24 @@ class Users:
         else:
             return 0
 
-    def add_point(self, additional_points=1):
-    # 本日初のポイント獲得かどうかを判定
-    if self.data['last_pointed_month'] == self.__get_adjusted_month_str() and self.data["last_pointed_date"] != self.__get_adjusted_date_str():
-        self.data['point_count'] += additional_points
-        self.data["last_pointed_date"] = self.__get_adjusted_date_str()
-    elif self.data["last_pointed_date"] == self.__get_adjusted_date_str():
-        # 本日すでにポイントを獲得している場合は、ここで何もしない
-        pass
-    else:
-        # 新しい月の場合は、ポイントカウントと最終ポイント獲得月を更新
-        self.data['last_pointed_month'] = self.__get_adjusted_month_str()
-        self.data['point_count'] = additional_points
-    self.__save()
+    def add_point(self, points):
+        current_month = self.__get_adjusted_month_str()
+        current_date = self.__get_adjusted_date_str()
+        
+        # 新しい月の場合、月間ポイントと最終ポイント獲得日をリセット
+        if self.data['last_pointed_month'] != current_month:
+            self.data['last_pointed_month'] = current_month
+            self.data['last_pointed_date'] = 0
+            self.data['point_count'] = 0
+        
+        # その日の最高得点を更新する
+        # float型のpointsをDecimal型に変換してから比較・保存する
+        points = Decimal(str(points))
+        if self.data["last_pointed_date"] != current_date or points > Decimal(str(self.data['point_count'])):
+            self.data["last_pointed_date"] = current_date
+            self.data['point_count'] = points
+        
+        self.__save()
 
     def add_usage(self):
         self.data['api_count_total'] += 1
