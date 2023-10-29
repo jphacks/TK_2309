@@ -260,10 +260,7 @@ def lambda_handler(event, context):
     
     # LINE上での処理
     if user_message == "[挑戦]ツインズリンク":
-        if day_str in double_days:
-            hidden_text = "ツインズリンクに挑戦しよう！\n今日はポイント2倍デー！クリアすると、2ポイントを獲得できます！\n\n-----------\n今日のフレーズ:" + phrase +"\n【" + phrase + "】と私に言わせたらクリア！早速会話を始めましょう！\n-----------"
-        else:
-            hidden_text = "今日のお題:\n【" + phrase + "】\n-----------\nこの内容を私に言わせてみてください！"
+        hidden_text = "今日のお題:\n【" + phrase + "】\n-----------\nこの内容を私に言わせてみてください！"
         text = "ツインズリンクに挑戦しよう！今日のフレーズを私に言わせることが出来たら成功！"
         send_reply_message(message_event['replyToken'], hidden_text)
     elif any(keyword in user_message for keyword in keywords) or phrase in user_message:
@@ -281,7 +278,7 @@ def lambda_handler(event, context):
         text = "上記の画像を参考に使い方を確認してください！"
         send_reply_message(message_event['replyToken'], text)
     elif user_message == "[確認]先月のランキング":
-        text = "以下が先月のランキングになります！\n--------------------------------\n🥇しょうまさん-3,452.1 point\n🥈りょうさん-3,391.7 point\n🥉ひまるんさん-2,971.0 point\n4位ジャパンさん-2,813.7 point\n5位ハックスさん-2,771.4 point\n\n--------------------------------\nおめでとうございます!！"
+        text = "以下が先月のランキングになります！\n--------------------------------\n🥇しょうまさん・・・3,452.1 point\n🥈りょうさん・・・3,391.7 point\n🥉ひまるんさん・・・2,971.0 point\n4位ジャパンさん・・・2,813.7 point\n5位ハックスさん・・・2,771.4 point\n--------------------------------\nおめでとうございます!！\n(リリース前のため仮のものです)"
         send_reply_message(message_event['replyToken'], text)
     elif user_message == "【ニックネーム-確定】":
         return {'statusCode': 200, 'body': json.dumps('Success!')}
@@ -309,8 +306,9 @@ def lambda_handler(event, context):
         else:
             text = send_to_openai(chat_history)
         points = determine_points(goo_lab_api, theme, phrase, text)
+        user.add_point(points)
         if points > 70:
-            user.add_point()
+            user.add_point(points)
             base_tweet_text = "ツインズリンクを" + str(determine_points(goo_lab_api, theme, phrase, text)) + "点でクリア！\n\n今日のお題\n【" + phrase + "】" +"\n\n#TwinsLink #JPHACKS #JPHACKS2023 \n\n気になった方は以下のリンクから追加！\n"
             long_link_url = "https://liff.line.me/1645278921-kWRPP32q/?accountId=478khwxt"
             base_tweet_text += long_link_url
