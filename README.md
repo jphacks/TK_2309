@@ -107,7 +107,7 @@ Twins Linkを用いれば、ユーザーは数値化されたプロンプトエ�
 この技術の該当ファイル：
 https://github.com/jphacks/TK_2309/blob/master/similarity_points.py
 #### 技術を開発する前に行ったAPIの事前調査
-この技術を開発する前に、実際にgooラボAPIを使用して検証を行った結果・議論を以下のNotionで紹介しています。
+この技術を開発する前に、実際にgooラボAPIを使用して検証を行った結果・議論を以下のNotionで紹介しています。<br>
 https://fork-emoji-c1c.notion.site/goo-API-Twins-Link-1c8f54c173c34d1d9b3c29b263e8597d?pvs=4
 
 
