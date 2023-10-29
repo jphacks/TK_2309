@@ -106,6 +106,10 @@ Twins Linkを用いれば、ユーザーは数値化されたプロンプトエ�
 ![image](https://github.com/jphacks/TK_2309/assets/148039751/ed481589-deff-4643-8da4-2454f6147e0e)
 この技術の該当ファイル：
 https://github.com/jphacks/TK_2309/blob/master/similarity_points.py
+<br>
+####  技術を開発する前に行ったAPIの事前調査
+この技術を開発する前に、実際にgooラボAPIを使用して検証を行った結果・議論を以下のNotionで紹介しています。
+https://fork-emoji-c1c.notion.site/goo-API-Twins-Link-1c8f54c173c34d1d9b3c29b263e8597d?pvs=4
 
 
 
@@ -121,9 +125,6 @@ https://techacademy.jp/course/first-prompt-engineering
 <br>
 https://ctwo.pro/aidx/
 <br><br>
-
-
-###  今回利用するにあたってのAPI調査
 
 
 
