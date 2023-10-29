@@ -45,12 +45,13 @@ gooラボAPIの「ひらがな化API」、「キーワード抽出API」、「�
 
 
 #### API・データ
-LINE Messaging API
+* LINE Messaging API
 * ChatGPT API(GPT-3.5モデル)
+* StripeAPI
 * gooラボAPI(ひらがな化API, キーワード抽出API, テキストペア類似度API)
 
 #### フレームワーク・ライブラリ・モジュール
-* Stripe
+* 
 * 
 
 
