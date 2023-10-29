@@ -33,10 +33,10 @@ Twins Linkは、ライフハックに関するお題を用いて、プロンプ�
 
 以下のURLからLINE友達追加して実際に触っていただけます。<br>
 https://liff.line.me/1645278921-kWRPP32q/?accountId=478khwxt
+<br>
 
 Twins Link起動後、「Let's リンク」を選択して、「お題例:散らかりがちなケーブルをコンパクトにまとめることができます！」に対して以下の質問を投げかけてみてください。動作を確認できます。<br>
-以下のURLからLINE友達追加して実際に触っていただけます。<br>
-https://liff.line.me/1645278921-kWRPP32q/?accountId=478khwxt
+
 
 他にもご自身でオリジナルな質問を考えて高得点を目指してみてください！！<br><br>
 
