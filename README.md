@@ -98,8 +98,12 @@ Twins Linkを用いれば、ユーザーは数値化されたプロンプトエ�
 
 ### 独自技術
 #### ハッカソンで開発した独自機能・技術
-* 独自で開発したものの内容をこちらに記載してください
-* 特に力を入れた部分をファイルリンク、またはcommit_idを記載してください。
+* プロンプトエンジニアリング力の数値化機能(gooラボAPIを3種類使用)
+* 以下のフローチャートの様に計算を行っています。
+![image](https://github.com/jphacks/TK_2309/assets/148039751/ed481589-deff-4643-8da4-2454f6147e0e)
+この技術の該当ファイル：
+https://github.com/jphacks/TK_2309/blob/master/similarity_points.py
+
 
 
 ### 競合調査
